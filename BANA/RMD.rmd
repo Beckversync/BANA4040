@@ -1,0 +1,79 @@
+---
+title: "Job Proficiency Analysis"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Job Proficiency Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+This vignette analyzes job proficiency data using a dataset stored in `data.xlsx`. We visualize the relationship between job proficiency and test scores using scatterplots.
+
+## Load Data
+
+```{r load-data}
+library(readxl)
+
+# Read data from "data.xlsx" without headers
+jobs <- read_excel("data.xlsx", col_names = FALSE)
+
+# Assign column names to the dataframe
+colnames(jobs) <- c("proficiency", "t1", "t2", "t3", "t4")
+
+# Display data summary
+summary(jobs)
+```
+
+## Visualize Data
+
+We create scatterplots to visualize the relationship between job proficiency and each test score.
+
+```{r scatterplots}
+# Set appropriate plot size
+options(repr.plot.width = 8, repr.plot.height = 8)
+
+# Set plotting area to 2x2 grid
+par(mfrow = c(2, 2), mar = c(4, 4, 2, 1)) # Add margin settings
+
+# Scatterplot for proficiency vs t1
+plot(jobs$t1, jobs$proficiency,
+     xlab = "Test 1 (t1)",
+     ylab = "Job Proficiency",
+     main = "Proficiency vs t1")
+
+# Scatterplot for proficiency vs t2
+plot(jobs$t2, jobs$proficiency,
+     xlab = "Test 2 (t2)",
+     ylab = "Job Proficiency",
+     main = "Proficiency vs t2")
+
+# Scatterplot for proficiency vs t3
+plot(jobs$t3, jobs$proficiency,
+     xlab = "Test 3 (t3)",
+     ylab = "Job Proficiency",
+     main = "Proficiency vs t3")
+
+# Scatterplot for proficiency vs t4
+plot(jobs$t4, jobs$proficiency,
+     xlab = "Test 4 (t4)",
+     ylab = "Job Proficiency",
+     main = "Proficiency vs t4")
+
+# Reset plotting area to default (1x1)
+par(mfrow = c(1, 1))
+```
+
+## Conclusion
+
+The scatterplots provide insights into how each test score correlates with job proficiency. Further statistical analysis could quantify these relationships.
