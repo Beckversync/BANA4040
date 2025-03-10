@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-
+## Problem 1
 ## Introduction
 
 This vignette analyzes job proficiency data using a dataset stored in `data.xlsx`. We visualize the relationship between job proficiency and test scores using scatterplots.
@@ -85,3 +85,137 @@ par(mfrow = c(1, 1))
 ## Conclusion
 
 The scatterplots provide insights into how each test score correlates with job proficiency. Further statistical analysis could quantify these relationships.
+
+## Problem 2
+
+
+```{r Định nghĩa hàm tính các chỉ số thống kê của mô hình}
+
+model_stats <- function(fit, MSE_full){
+  # fit: đối tượng lm (mô hình hồi quy)
+  # MSE_full: Mean Squared Error của mô hình đầy đủ dùng để tính Mallows' Cp
+  
+  n <- length(fit$residuals)    # Số lượng quan sát
+  p <- length(coef(fit))        # Số tham số (bao gồm intercept)
+  
+  # Tính hệ số xác định R² và R² hiệu chỉnh từ kết quả summary của mô hình
+  r2     <- summary(fit)$r.squared
+  adjr2  <- summary(fit)$adj.r.squared
+  
+  # Tính tổng bình phương sai số (SSE) của mô hình fit
+  sse_p  <- sum(resid(fit)^2)
+  
+  # Tính chỉ số PRESS: PRESS = Σ[(e_i / (1 - h_ii))^2]
+  # Trong đó: e_i là phần dư, h_ii là giá trị hat (đo lường ảnh hưởng của mỗi quan sát)
+  hat    <- lm.influence(fit)$hat  # Lấy giá trị hat của mô hình
+  res    <- resid(fit)            # Lấy phần dư của mô hình
+  press  <- sum((res/(1 - hat))^2)
+  
+  # Tính AIC và BIC của mô hình
+  aic_val <- AIC(fit)
+  bic_val <- BIC(fit)
+  
+  # Tính Mallows' Cp với công thức: Cp = SSE_p / MSE_full - (n - 2*p)
+  cp_val  <- sse_p / MSE_full - (n - 2*p)
+  
+  # Trả về vector chứa các chỉ số
+  return(c(p, r2, adjr2, press, aic_val, bic_val, cp_val))
+}
+```
+```{r Xây dựng mô hình đầy đủ và tính MSE}
+# Xây dựng mô hình hồi quy đầy đủ với tất cả các biến dự báo
+lm_full <- lm(proficiency ~ t1 + t2 + t3 + t4, data = jobs)
+
+# Tính tổng bình phương sai số (SSE) của mô hình đầy đủ
+SSE_full <- sum(resid(lm_full)^2)
+
+# Số lượng quan sát trong dữ liệu
+n <- nrow(jobs)
+
+# Số tham số của mô hình đầy đủ (4 biến dự báo + intercept)
+p_full <- length(coef(lm_full)) 
+
+# Tính Mean Squared Error (MSE) của mô hình đầy đủ
+MSE_full <- SSE_full / (n - p_full)
+```
+
+```{r Tính toán các chỉ số cho các mô hình con (submodels)}
+# Tạo dataframe rỗng để lưu kết quả
+results <- data.frame(
+  Model   = character(),
+  p       = numeric(),  # Số tham số (bao gồm intercept)
+  R2      = numeric(),
+  AdjR2   = numeric(),
+  PRESS   = numeric(),
+  AIC     = numeric(),
+  BIC     = numeric(),
+  Cp      = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Danh sách các biến dự báo
+preds <- c("t1", "t2", "t3", "t4")
+
+# Duyệt qua các tập con của biến dự báo với số lượng biến từ 0 đến 4
+for (k in 0:4) {
+  # Lấy tất cả tổ hợp k phần tử từ vector preds
+  subset_list <- combn(preds, k)
+  
+  if (k == 0) {
+    # Trường hợp k = 0: mô hình chỉ có intercept (không có biến dự báo)
+    form <- as.formula("proficiency ~ 1")
+    fit <- lm(form, data = jobs)
+    stats <- model_stats(fit, MSE_full)
+    
+    results <- rbind(
+      results,
+      data.frame(
+        Model = "Intercept Only",
+        p     = stats[1],
+        R2    = stats[2],
+        AdjR2 = stats[3],
+        PRESS = stats[4],
+        AIC   = stats[5],
+        BIC   = stats[6],
+        Cp    = stats[7],
+        stringsAsFactors = FALSE
+      )
+    )
+    
+  } else {
+    # Trường hợp k > 0: duyệt qua từng tổ hợp của các biến dự báo
+    for (i in 1:ncol(subset_list)) {
+      vars <- subset_list[, i]  # Lấy tập hợp các biến dự báo cho mô hình hiện tại
+      
+      # Tạo công thức hồi quy từ các biến được chọn
+      form <- as.formula(paste("proficiency ~", paste(vars, collapse = " + ")))
+      
+      # Xây dựng mô hình hồi quy với công thức trên
+      fit <- lm(form, data = jobs)
+      stats <- model_stats(fit, MSE_full)
+      
+      # Thêm kết quả của mô hình vào dataframe results
+      results <- rbind(
+        results,
+        data.frame(
+          Model = paste(vars, collapse = " + "),
+          p     = stats[1],
+          R2    = stats[2],
+          AdjR2 = stats[3],
+          PRESS = stats[4],
+          AIC   = stats[5],
+          BIC   = stats[6],
+          Cp    = stats[7],
+          stringsAsFactors = FALSE
+        )
+      )
+    }
+  }
+}
+```
+
+```{r In}
+# In kết quả các chỉ số thống kê của các mô hình con
+knitr::kable(results, caption = "Bảng kết quả các mô hình dự báo")
+
+```

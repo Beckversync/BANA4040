@@ -345,6 +345,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
+<div id="problem-1" class="section level2">
+<h2>Problem 1</h2>
+</div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>This vignette analyzes job proficiency data using a dataset stored in
@@ -433,6 +436,315 @@ proficiency and each test score.</p>
 <p>The scatterplots provide insights into how each test score correlates
 with job proficiency. Further statistical analysis could quantify these
 relationships.</p>
+</div>
+<div id="problem-2" class="section level2">
+<h2>Problem 2</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>model_stats <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, MSE_full){</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="co"># fit: đối tượng lm (mô hình hồi quy)</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="co"># MSE_full: Mean Squared Error của mô hình đầy đủ dùng để tính Mallows&#39; Cp</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  </span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(fit<span class="sc">$</span>residuals)    <span class="co"># Số lượng quan sát</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">coef</span>(fit))        <span class="co"># Số tham số (bao gồm intercept)</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  </span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="co"># Tính hệ số xác định R² và R² hiệu chỉnh từ kết quả summary của mô hình</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  r2     <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit)<span class="sc">$</span>r.squared</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  adjr2  <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit)<span class="sc">$</span>adj.r.squared</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  </span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="co"># Tính tổng bình phương sai số (SSE) của mô hình fit</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  sse_p  <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">resid</span>(fit)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  </span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  <span class="co"># Tính chỉ số PRESS: PRESS = Σ[(e_i / (1 - h_ii))^2]</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="co"># Trong đó: e_i là phần dư, h_ii là giá trị hat (đo lường ảnh hưởng của mỗi quan sát)</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>  hat    <span class="ot">&lt;-</span> <span class="fu">lm.influence</span>(fit)<span class="sc">$</span>hat  <span class="co"># Lấy giá trị hat của mô hình</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  res    <span class="ot">&lt;-</span> <span class="fu">resid</span>(fit)            <span class="co"># Lấy phần dư của mô hình</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  press  <span class="ot">&lt;-</span> <span class="fu">sum</span>((res<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">-</span> hat))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  </span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>  <span class="co"># Tính AIC và BIC của mô hình</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>  aic_val <span class="ot">&lt;-</span> <span class="fu">AIC</span>(fit)</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>  bic_val <span class="ot">&lt;-</span> <span class="fu">BIC</span>(fit)</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>  </span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>  <span class="co"># Tính Mallows&#39; Cp với công thức: Cp = SSE_p / MSE_full - (n - 2*p)</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>  cp_val  <span class="ot">&lt;-</span> sse_p <span class="sc">/</span> MSE_full <span class="sc">-</span> (n <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>p)</span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>  </span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>  <span class="co"># Trả về vector chứa các chỉ số</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(p, r2, adjr2, press, aic_val, bic_val, cp_val))</span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Xây dựng mô hình hồi quy đầy đủ với tất cả các biến dự báo</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>lm_full <span class="ot">&lt;-</span> <span class="fu">lm</span>(proficiency <span class="sc">~</span> t1 <span class="sc">+</span> t2 <span class="sc">+</span> t3 <span class="sc">+</span> t4, <span class="at">data =</span> jobs)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Tính tổng bình phương sai số (SSE) của mô hình đầy đủ</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>SSE_full <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">resid</span>(lm_full)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Số lượng quan sát trong dữ liệu</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(jobs)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co"># Số tham số của mô hình đầy đủ (4 biến dự báo + intercept)</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>p_full <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">coef</span>(lm_full)) </span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co"># Tính Mean Squared Error (MSE) của mô hình đầy đủ</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>MSE_full <span class="ot">&lt;-</span> SSE_full <span class="sc">/</span> (n <span class="sc">-</span> p_full)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Tạo dataframe rỗng để lưu kết quả</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">Model   =</span> <span class="fu">character</span>(),</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">p       =</span> <span class="fu">numeric</span>(),  <span class="co"># Số tham số (bao gồm intercept)</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="at">R2      =</span> <span class="fu">numeric</span>(),</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="at">AdjR2   =</span> <span class="fu">numeric</span>(),</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="at">PRESS   =</span> <span class="fu">numeric</span>(),</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="at">AIC     =</span> <span class="fu">numeric</span>(),</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="at">BIC     =</span> <span class="fu">numeric</span>(),</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="at">Cp      =</span> <span class="fu">numeric</span>(),</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co"># Danh sách các biến dự báo</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>preds <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;t1&quot;</span>, <span class="st">&quot;t2&quot;</span>, <span class="st">&quot;t3&quot;</span>, <span class="st">&quot;t4&quot;</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co"># Duyệt qua các tập con của biến dự báo với số lượng biến từ 0 đến 4</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">4</span>) {</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  <span class="co"># Lấy tất cả tổ hợp k phần tử từ vector preds</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>  subset_list <span class="ot">&lt;-</span> <span class="fu">combn</span>(preds, k)</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  </span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>  <span class="cf">if</span> (k <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>    <span class="co"># Trường hợp k = 0: mô hình chỉ có intercept (không có biến dự báo)</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>    form <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="st">&quot;proficiency ~ 1&quot;</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>    fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(form, <span class="at">data =</span> jobs)</span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>    stats <span class="ot">&lt;-</span> <span class="fu">model_stats</span>(fit, MSE_full)</span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>    </span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>    results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>      results,</span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a>      <span class="fu">data.frame</span>(</span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a>        <span class="at">Model =</span> <span class="st">&quot;Intercept Only&quot;</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>        <span class="at">p     =</span> stats[<span class="dv">1</span>],</span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>        <span class="at">R2    =</span> stats[<span class="dv">2</span>],</span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a>        <span class="at">AdjR2 =</span> stats[<span class="dv">3</span>],</span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a>        <span class="at">PRESS =</span> stats[<span class="dv">4</span>],</span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a>        <span class="at">AIC   =</span> stats[<span class="dv">5</span>],</span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a>        <span class="at">BIC   =</span> stats[<span class="dv">6</span>],</span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a>        <span class="at">Cp    =</span> stats[<span class="dv">7</span>],</span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a>        <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a>      )</span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a>    )</span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a>    </span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a>    <span class="co"># Trường hợp k &gt; 0: duyệt qua từng tổ hợp của các biến dự báo</span></span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(subset_list)) {</span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a>      vars <span class="ot">&lt;-</span> subset_list[, i]  <span class="co"># Lấy tập hợp các biến dự báo cho mô hình hiện tại</span></span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a>      </span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a>      <span class="co"># Tạo công thức hồi quy từ các biến được chọn</span></span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a>      form <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;proficiency ~&quot;</span>, <span class="fu">paste</span>(vars, <span class="at">collapse =</span> <span class="st">&quot; + &quot;</span>)))</span>
+<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a>      </span>
+<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a>      <span class="co"># Xây dựng mô hình hồi quy với công thức trên</span></span>
+<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a>      fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(form, <span class="at">data =</span> jobs)</span>
+<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a>      stats <span class="ot">&lt;-</span> <span class="fu">model_stats</span>(fit, MSE_full)</span>
+<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a>      </span>
+<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a>      <span class="co"># Thêm kết quả của mô hình vào dataframe results</span></span>
+<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a>      results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a>        results,</span>
+<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a>        <span class="fu">data.frame</span>(</span>
+<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a>          <span class="at">Model =</span> <span class="fu">paste</span>(vars, <span class="at">collapse =</span> <span class="st">&quot; + &quot;</span>),</span>
+<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a>          <span class="at">p     =</span> stats[<span class="dv">1</span>],</span>
+<span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a>          <span class="at">R2    =</span> stats[<span class="dv">2</span>],</span>
+<span id="cb6-62"><a href="#cb6-62" tabindex="-1"></a>          <span class="at">AdjR2 =</span> stats[<span class="dv">3</span>],</span>
+<span id="cb6-63"><a href="#cb6-63" tabindex="-1"></a>          <span class="at">PRESS =</span> stats[<span class="dv">4</span>],</span>
+<span id="cb6-64"><a href="#cb6-64" tabindex="-1"></a>          <span class="at">AIC   =</span> stats[<span class="dv">5</span>],</span>
+<span id="cb6-65"><a href="#cb6-65" tabindex="-1"></a>          <span class="at">BIC   =</span> stats[<span class="dv">6</span>],</span>
+<span id="cb6-66"><a href="#cb6-66" tabindex="-1"></a>          <span class="at">Cp    =</span> stats[<span class="dv">7</span>],</span>
+<span id="cb6-67"><a href="#cb6-67" tabindex="-1"></a>          <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-68"><a href="#cb6-68" tabindex="-1"></a>        )</span>
+<span id="cb6-69"><a href="#cb6-69" tabindex="-1"></a>      )</span>
+<span id="cb6-70"><a href="#cb6-70" tabindex="-1"></a>    }</span>
+<span id="cb6-71"><a href="#cb6-71" tabindex="-1"></a>  }</span>
+<span id="cb6-72"><a href="#cb6-72" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># In kết quả các chỉ số thống kê của các mô hình con</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(results, <span class="at">caption =</span> <span class="st">&quot;Bảng kết quả các mô hình dự báo&quot;</span>)</span></code></pre></div>
+<table>
+<caption>Bảng kết quả các mô hình dự báo</caption>
+<colgroup>
+<col width="22%" />
+<col width="3%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Model</th>
+<th align="right">p</th>
+<th align="right">R2</th>
+<th align="right">AdjR2</th>
+<th align="right">PRESS</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">Cp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Intercept Only</td>
+<td align="right">1</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">9824.2188</td>
+<td align="right">222.2491</td>
+<td align="right">224.6868</td>
+<td align="right">515.964627</td>
+</tr>
+<tr class="even">
+<td align="left">t1</td>
+<td align="right">2</td>
+<td align="right">0.2646184</td>
+<td align="right">0.2326452</td>
+<td align="right">7791.5994</td>
+<td align="right">216.5649</td>
+<td align="right">220.2216</td>
+<td align="right">375.344689</td>
+</tr>
+<tr class="odd">
+<td align="left">t2</td>
+<td align="right">2</td>
+<td align="right">0.2470147</td>
+<td align="right">0.2142762</td>
+<td align="right">7991.0964</td>
+<td align="right">217.1563</td>
+<td align="right">220.8130</td>
+<td align="right">384.832454</td>
+</tr>
+<tr class="even">
+<td align="left">t3</td>
+<td align="right">2</td>
+<td align="right">0.8047247</td>
+<td align="right">0.7962344</td>
+<td align="right">2064.5976</td>
+<td align="right">183.4155</td>
+<td align="right">187.0721</td>
+<td align="right">84.246496</td>
+</tr>
+<tr class="odd">
+<td align="left">t4</td>
+<td align="right">2</td>
+<td align="right">0.7558329</td>
+<td align="right">0.7452170</td>
+<td align="right">2548.6349</td>
+<td align="right">189.0015</td>
+<td align="right">192.6581</td>
+<td align="right">110.597414</td>
+</tr>
+<tr class="even">
+<td align="left">t1 + t2</td>
+<td align="right">3</td>
+<td align="right">0.4641948</td>
+<td align="right">0.4154853</td>
+<td align="right">6444.0411</td>
+<td align="right">210.6495</td>
+<td align="right">215.5250</td>
+<td align="right">269.780029</td>
+</tr>
+<tr class="odd">
+<td align="left">t1 + t3</td>
+<td align="right">3</td>
+<td align="right">0.9329956</td>
+<td align="right">0.9269043</td>
+<td align="right">760.9744</td>
+<td align="right">158.6741</td>
+<td align="right">163.5496</td>
+<td align="right">17.112978</td>
+</tr>
+<tr class="even">
+<td align="left">t1 + t4</td>
+<td align="right">3</td>
+<td align="right">0.8152656</td>
+<td align="right">0.7984716</td>
+<td align="right">2109.8967</td>
+<td align="right">184.0282</td>
+<td align="right">188.9037</td>
+<td align="right">80.565307</td>
+</tr>
+<tr class="odd">
+<td align="left">t2 + t3</td>
+<td align="right">3</td>
+<td align="right">0.8060733</td>
+<td align="right">0.7884436</td>
+<td align="right">2206.6460</td>
+<td align="right">185.2422</td>
+<td align="right">190.1177</td>
+<td align="right">85.519650</td>
+</tr>
+<tr class="even">
+<td align="left">t2 + t4</td>
+<td align="right">3</td>
+<td align="right">0.7832923</td>
+<td align="right">0.7635916</td>
+<td align="right">2491.7979</td>
+<td align="right">188.0189</td>
+<td align="right">192.8944</td>
+<td align="right">97.797790</td>
+</tr>
+<tr class="odd">
+<td align="left">t3 + t4</td>
+<td align="right">3</td>
+<td align="right">0.8772573</td>
+<td align="right">0.8660988</td>
+<td align="right">1449.6001</td>
+<td align="right">173.8075</td>
+<td align="right">178.6830</td>
+<td align="right">47.153985</td>
+</tr>
+<tr class="even">
+<td align="left">t1 + t2 + t3</td>
+<td align="right">4</td>
+<td align="right">0.9340931</td>
+<td align="right">0.9246779</td>
+<td align="right">831.1521</td>
+<td align="right">160.2613</td>
+<td align="right">166.3556</td>
+<td align="right">18.521465</td>
+</tr>
+<tr class="odd">
+<td align="left">t1 + t2 + t4</td>
+<td align="right">4</td>
+<td align="right">0.8453581</td>
+<td align="right">0.8232664</td>
+<td align="right">1885.8454</td>
+<td align="right">181.5830</td>
+<td align="right">187.6774</td>
+<td align="right">66.346500</td>
+</tr>
+<tr class="even">
+<td align="left">t1 + t3 + t4</td>
+<td align="right">4</td>
+<td align="right">0.9615422</td>
+<td align="right">0.9560482</td>
+<td align="right">471.4520</td>
+<td align="right">146.7942</td>
+<td align="right">152.8886</td>
+<td align="right">3.727399</td>
+</tr>
+<tr class="odd">
+<td align="left">t2 + t3 + t4</td>
+<td align="right">4</td>
+<td align="right">0.8789698</td>
+<td align="right">0.8616797</td>
+<td align="right">1570.5610</td>
+<td align="right">175.4562</td>
+<td align="right">181.5506</td>
+<td align="right">48.231020</td>
+</tr>
+<tr class="even">
+<td align="left">t1 + t2 + t3 + t4</td>
+<td align="right">5</td>
+<td align="right">0.9628918</td>
+<td align="right">0.9554702</td>
+<td align="right">518.9885</td>
+<td align="right">147.9011</td>
+<td align="right">155.2144</td>
+<td align="right">5.000000</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 
