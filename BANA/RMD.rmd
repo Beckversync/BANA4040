@@ -23,55 +23,63 @@ This vignette analyzes job proficiency data using a dataset stored in `data.xlsx
 ## Load Data
 
 ```{r load-data}
+# Sử dụng thư viện readxl để đọc dữ liệu từ file Excel
 library(readxl)
 
-# Read data from "data.xlsx" without headers
+# Đọc dữ liệu từ file "data.xlsx" 
+# Tham số col_names = FALSE có nghĩa là file không có hàng tiêu đề nên chúng ta sẽ tự đặt tên sau này.
 jobs <- read_excel("data.xlsx", col_names = FALSE)
 
-# Assign column names to the dataframe
+# Gán tên cho các cột của dataframe:
+# - "proficiency": độ chuyên môn của công việc
+# - "t1", "t2", "t3", "t4": điểm số của các bài kiểm tra tương ứng.
 colnames(jobs) <- c("proficiency", "t1", "t2", "t3", "t4")
 
-# Display data summary
+# Hiển thị tóm tắt thống kê của dữ liệu (bao gồm min, max, median, mean, ...)
 summary(jobs)
+
 ```
 
 ## Visualize Data
 
 We create scatterplots to visualize the relationship between job proficiency and each test score.
 
-```{r scatterplots}
-# Set appropriate plot size
-options(repr.plot.width = 8, repr.plot.height = 8)
+```{r scatterplots, echo=TRUE, fig.width=7, fig.height=7}
+# Thiết lập kích thước biểu đồ để hiển thị rõ ràng
+options(repr.plot.width = 20, repr.plot.height = 20)
 
-# Set plotting area to 2x2 grid
-par(mfrow = c(2, 2), mar = c(4, 4, 2, 1)) # Add margin settings
+# Chia vùng vẽ thành 2 hàng x 2 cột để hiển thị 4 biểu đồ cùng lúc.
+# Tham số mfrow = c(2, 2) điều chỉnh lưới vẽ biểu đồ.
+# Tham số mar = c(4, 4, 2, 1) thiết lập lề (margin) cho biểu đồ: dưới, trái, trên, phải.
+par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
 
-# Scatterplot for proficiency vs t1
+# Biểu đồ phân tán: điểm số Test 1 (t1) vs độ chuyên môn (proficiency)
 plot(jobs$t1, jobs$proficiency,
-     xlab = "Test 1 (t1)",
-     ylab = "Job Proficiency",
-     main = "Proficiency vs t1")
+     xlab = "Test 1 (t1)",      # Nhãn trục X: điểm của bài kiểm tra t1
+     ylab = "Job Proficiency",  # Nhãn trục Y: độ chuyên môn
+     main = "Proficiency vs t1")# Tiêu đề biểu đồ
 
-# Scatterplot for proficiency vs t2
+# Biểu đồ phân tán: điểm số Test 2 (t2) vs độ chuyên môn
 plot(jobs$t2, jobs$proficiency,
      xlab = "Test 2 (t2)",
      ylab = "Job Proficiency",
      main = "Proficiency vs t2")
 
-# Scatterplot for proficiency vs t3
+# Biểu đồ phân tán: điểm số Test 3 (t3) vs độ chuyên môn
 plot(jobs$t3, jobs$proficiency,
      xlab = "Test 3 (t3)",
      ylab = "Job Proficiency",
      main = "Proficiency vs t3")
 
-# Scatterplot for proficiency vs t4
+# Biểu đồ phân tán: điểm số Test 4 (t4) vs độ chuyên môn
 plot(jobs$t4, jobs$proficiency,
      xlab = "Test 4 (t4)",
      ylab = "Job Proficiency",
      main = "Proficiency vs t4")
 
-# Reset plotting area to default (1x1)
+# Sau khi hoàn thành vẽ 4 biểu đồ, đặt lại vùng vẽ về mặc định (1 hàng, 1 cột)
 par(mfrow = c(1, 1))
+
 ```
 
 ## Conclusion
