@@ -7,8 +7,8 @@ library(DAAG)
 library(readxl)
 
 # Giả sử bạn đã đọc dữ liệu vào jobs_data:
-# jobs_data <- read_excel("data.xlsx", col_names = FALSE)
-# colnames(jobs_data) <- c("y", "t1", "t2", "t3", "t4")
+jobs_data <- read_excel("data.xlsx", col_names = FALSE)
+colnames(jobs_data) <- c("y", "t1", "t2", "t3", "t4")
 
 #-----------------------------------------------
 # 2) Tạo danh sách tất cả các tổ hợp biến
