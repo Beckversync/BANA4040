@@ -1,4 +1,4 @@
-# Problem 1 , part 1:
+
 library(readxl)
 jobs <- read_excel("data.xlsx", col_names = FALSE)
 colnames(jobs) <- c("proficiency", "t1", "t2", "t3", "t4")

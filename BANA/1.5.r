@@ -1,4 +1,4 @@
-# 1. Suppose we have the following data for models with p ≤ 3:
+
 modelNames <- c("Intercept only", 
                 "t1", "t2", "t3", "t4",
                 "t1 + t2", "t1 + t3", "t1 + t4",
