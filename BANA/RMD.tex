@@ -575,6 +575,74 @@ Fitting the model and model diagnostic For the best model according to
 R2a,p, fit the corresponding regression model and assess whether model
 assumptions are met. Do we have a good fit for the model?
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{options}\NormalTok{(}\AttributeTok{repr.plot.width =} \DecValTok{7}\NormalTok{, }\AttributeTok{repr.plot.height =} \DecValTok{6}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\CommentTok{\# Assuming the data frame is \textquotesingle{}jobs\textquotesingle{} with columns proficiency, t1, t2, t3, t4:}
+\NormalTok{best\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(proficiency }\SpecialCharTok{\textasciitilde{}}\NormalTok{ t1 }\SpecialCharTok{+}\NormalTok{ t3 }\SpecialCharTok{+}\NormalTok{ t4, }\AttributeTok{data =}\NormalTok{ jobs)}
+\FunctionTok{summary}\NormalTok{(best\_model)}
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{} Call:}
+\CommentTok{\#\textgreater{} lm(formula = proficiency \textasciitilde{} t1 + t3 + t4, data = jobs)}
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{} Residuals:}
+\CommentTok{\#\textgreater{}     Min      1Q  Median      3Q     Max }
+\CommentTok{\#\textgreater{} {-}5.4579 {-}3.1563 {-}0.2057  1.8070  6.6083 }
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{} Coefficients:}
+\CommentTok{\#\textgreater{}               Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\CommentTok{\#\textgreater{} (Intercept) {-}124.20002    9.87406 {-}12.578 3.04e{-}11 ***}
+\CommentTok{\#\textgreater{} t1             0.29633    0.04368   6.784 1.04e{-}06 ***}
+\CommentTok{\#\textgreater{} t3             1.35697    0.15183   8.937 1.33e{-}08 ***}
+\CommentTok{\#\textgreater{} t4             0.51742    0.13105   3.948 0.000735 ***}
+\CommentTok{\#\textgreater{} {-}{-}{-}}
+\CommentTok{\#\textgreater{} Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\CommentTok{\#\textgreater{} }
+\CommentTok{\#\textgreater{} Residual standard error: 4.072 on 21 degrees of freedom}
+\CommentTok{\#\textgreater{} Multiple R{-}squared:  0.9615, Adjusted R{-}squared:  0.956 }
+\CommentTok{\#\textgreater{} F{-}statistic:   175 on 3 and 21 DF,  p{-}value: 5.16e{-}15}
+\CommentTok{\# plot(best\_model, which = 1)  \# Residuals vs Fitted}
+\FunctionTok{plot}\NormalTok{(best\_model, }\AttributeTok{which =} \DecValTok{2}\NormalTok{)  }\CommentTok{\# Normal Q{-}Q plot}
+\FunctionTok{plot}\NormalTok{(best\_model, }\AttributeTok{which =} \DecValTok{3}\NormalTok{)  }\CommentTok{\# Scale{-}Location plot (spread vs. fitted)}
+\FunctionTok{plot}\NormalTok{(best\_model, }\AttributeTok{which =} \DecValTok{4}\NormalTok{)  }\CommentTok{\# Cook\textquotesingle{}s distance}
+\FunctionTok{plot}\NormalTok{(best\_model, }\AttributeTok{which =} \DecValTok{5}\NormalTok{)  }\CommentTok{\# Residuals vs Leverage}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-1-1.pdf}}
+
+\subsection{Conclusion}\label{conclusion-1}
+
+From the four diagnostic plots, yes, the model looks to be fitting
+reasonably well overall. Here are some more detailed observations:
+
+Q--Q Plot The residuals lie fairly close to the diagonal, indicating
+that the normality assumption is not severely violated. There is a bit
+of deviation in the upper tail (observations such as \#16, \#19, \#25),
+but it's not drastic for a real‐world data set.
+
+Scale--Location (Spread vs.~Fitted) Plot Although the red loess line
+isn't perfectly flat, the variation in residuals doesn't show a strong
+funnel shape or any major nonconstant variance. A slight rise or fall in
+the red line can happen; as long as it's not extremely pronounced,
+homoscedasticity is not a big concern.
+
+Cook's Distance Observations \#11, \#16, and \#18 stand out somewhat,
+but their Cook's distance (roughly 0.2 at most) is still well below the
+usual ``rule‐of‐thumb'' cutoff of 1. This suggests no single point is
+exerting a dramatically outsized influence on the regression fit.
+
+Residuals vs.~Leverage Points \#16 and \#18 have relatively higher
+leverage (meaning these points lie a bit farther out in predictor
+space), but the standardized residuals are not huge. The dashed lines
+for Cook's distance confirm they're not excessively influential overall.
+
+Putting this all together, there are no severe violations of normality,
+constant variance, or linearity, and no single outlier is dominating the
+regression. Hence, we can conclude that the model assumptions are
+reasonably satisfied and we do have a good fit.
+
 \subsection{Part 5}\label{part-5}
 
 Which model is the best with a given number of predictors? Suppose we
@@ -629,11 +697,87 @@ function. Do the same for Mallow's Cp criterion.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-2-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-3-1.pdf}}
 
 \begin{verbatim}
 #> integer(0)
 \end{verbatim}
+
+\section{Model Selection with Two or Fewer
+Predictors}\label{model-selection-with-two-or-fewer-predictors}
+
+\subsection{1. Identify the Candidate
+Models}\label{identify-the-candidate-models}
+
+For models with \textbf{two predictors or fewer}, the possible models
+include:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{No predictors (Intercept-only):} \texttt{p\ =\ 1}
+\item
+  \textbf{One predictor:} \texttt{t1}, \texttt{t2}, \texttt{t3}, or
+  \texttt{t4} (\texttt{p\ =\ 2})
+\item
+  \textbf{Two predictors:} \texttt{t1\ +\ t2}, \texttt{t1\ +\ t3},
+  \texttt{t1\ +\ t4}, \texttt{t2\ +\ t3}, \texttt{t2\ +\ t4},
+  \texttt{t3\ +\ t4} (\texttt{p\ =\ 3})
+\end{itemize}
+
+The table below provides \textbf{BIC} and \textbf{Mallows' Cp} for each
+model.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{2. Best Model by BIC}\label{best-model-by-bic}
+
+Considering only models with \textbf{p ≤ 3}, the smallest \textbf{BIC}
+is for:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Model:} \texttt{t1\ +\ t3}
+\item
+  \textbf{BIC:} ≈ 163.55
+\end{itemize}
+
+This is \textbf{substantially lower} than any other model with one or
+two predictors (e.g., \texttt{t3} alone has \textbf{BIC ≈ 187.07}).
+
+\textbf{Conclusion:} Using the \textbf{BIC} criterion, the best choice
+is the model \textbf{\texttt{t1\ +\ t3}}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{3. Best Model by Mallows'
+Cp}\label{best-model-by-mallows-cp}
+
+Similarly, examining \textbf{Mallows' Cp} values for models with
+\textbf{p ≤ 3}, the smallest value is again for:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Model:} \texttt{t1\ +\ t3}
+\item
+  \textbf{Cp:} ≈ 17.11
+\end{itemize}
+
+This is \textbf{noticeably smaller} than the next-best single- or
+two-predictor model.
+
+\textbf{Conclusion:} By \textbf{Mallows' Cp}, the best model (with up to
+two predictors) is also \textbf{\texttt{t1\ +\ t3}}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{4. Final Conclusion}\label{final-conclusion}
+
+Whether judged by \textbf{BIC} or \textbf{Mallows' Cp}, if we are
+constrained to using \textbf{two or fewer predictors}, the
+\textbf{\texttt{t1\ +\ t3}} model is the \textbf{clear winner}.
 
 \subsection{Part 6}\label{part-6}
 
@@ -911,7 +1055,7 @@ might impact the result.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-5-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-6-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -924,14 +1068,19 @@ might impact the result.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-6-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-7-1.pdf}}
 
 \section{So sánh AIC của các mô
 hình}\label{so-suxe1nh-aic-cux1ee7a-cuxe1c-muxf4-huxecnh}
 
-aic\_values \textless- data.frame( Model = c(``Forward Selection'',
-``Backward Elimination'', ``Stepwise Regression''), AIC =
-c(AIC(forward\_model), AIC(backward\_model), AIC(stepwise\_model)) )
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aic\_values }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Model =} \FunctionTok{c}\NormalTok{(}\StringTok{"Forward Selection"}\NormalTok{, }\StringTok{"Backward Elimination"}\NormalTok{, }\StringTok{"Stepwise Regression"}\NormalTok{),}
+  \AttributeTok{AIC =} \FunctionTok{c}\NormalTok{(}\FunctionTok{AIC}\NormalTok{(forward\_model), }\FunctionTok{AIC}\NormalTok{(backward\_model), }\FunctionTok{AIC}\NormalTok{(stepwise\_model))}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -943,7 +1092,7 @@ c(AIC(forward\_model), AIC(backward\_model), AIC(stepwise\_model)) )
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-7-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-9-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1088,6 +1237,12 @@ BICp. Find the best models in terms of these criteria.
 \NormalTok{summary\_sub}\SpecialCharTok{$}\NormalTok{which[best\_adjr2\_index, ]}
 \CommentTok{\#\textgreater{} (Intercept)          t1          t2          t3          t4 }
 \CommentTok{\#\textgreater{}        TRUE        TRUE       FALSE        TRUE        TRUE}
+\NormalTok{summary\_sub}\SpecialCharTok{$}\NormalTok{which[best\_cp\_index, ]}
+\CommentTok{\#\textgreater{} (Intercept)          t1          t2          t3          t4 }
+\CommentTok{\#\textgreater{}        TRUE        TRUE       FALSE        TRUE        TRUE}
+\NormalTok{summary\_sub}\SpecialCharTok{$}\NormalTok{which[best\_bic\_index, ]}
+\CommentTok{\#\textgreater{} (Intercept)          t1          t2          t3          t4 }
+\CommentTok{\#\textgreater{}        TRUE        TRUE       FALSE        TRUE        TRUE}
 \CommentTok{\# Lưu ý: force.in / force.out trong leaps thường là chỉ số cột nếu x,y là dạng ma trận}
 \CommentTok{\# Nhưng với công thức, một số phiên bản cho phép ta truyền tên trực tiếp (nếu không được, hãy dùng chỉ số).}
 \NormalTok{fit\_sub2 }\OtherTok{\textless{}{-}} \FunctionTok{regsubsets}\NormalTok{(y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ t1 }\SpecialCharTok{+}\NormalTok{ t2 }\SpecialCharTok{+}\NormalTok{ t3 }\SpecialCharTok{+}\NormalTok{ t4,}
@@ -1099,16 +1254,6 @@ BICp. Find the best models in terms of these criteria.
                        \AttributeTok{force.out =} \StringTok{"t2"}\NormalTok{)}
 
 \NormalTok{summary\_sub2 }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(fit\_sub2)}
-\NormalTok{summary\_sub2}\SpecialCharTok{$}\NormalTok{which}
-\CommentTok{\#\textgreater{}   (Intercept)   t1   t3    t4    t2}
-\CommentTok{\#\textgreater{} 2        TRUE TRUE TRUE FALSE FALSE}
-\CommentTok{\#\textgreater{} 3        TRUE TRUE TRUE  TRUE FALSE}
-\NormalTok{summary\_sub2}\SpecialCharTok{$}\NormalTok{adjr2}
-\CommentTok{\#\textgreater{} [1] 0.9278921 0.9607737}
-\NormalTok{summary\_sub2}\SpecialCharTok{$}\NormalTok{cp}
-\CommentTok{\#\textgreater{} [1] 21.876185  4.659459}
-\NormalTok{summary\_sub2}\SpecialCharTok{$}\NormalTok{bic}
-\CommentTok{\#\textgreater{} [1] {-}55.75937 {-}68.36386}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1142,7 +1287,7 @@ BICp. Find the best models in terms of these criteria.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-11-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-13-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1156,7 +1301,7 @@ BICp. Find the best models in terms of these criteria.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-12-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-14-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1170,7 +1315,7 @@ BICp. Find the best models in terms of these criteria.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-13-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-15-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1244,7 +1389,7 @@ BICp. Find the best models in terms of these criteria.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-16-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{RMD_files/figure-latex/unnamed-chunk-18-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]

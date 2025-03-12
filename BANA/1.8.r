@@ -29,6 +29,11 @@ best_bic_index <- which.min(summary_sub$bic)
 
 # Kiểm tra biến nào được chọn ở mô hình best_adjr2_index
 summary_sub$which[best_adjr2_index, ]
+
+summary_sub$which[best_cp_index, ]
+
+summary_sub$which[best_bic_index, ]
+
 # Lưu ý: force.in / force.out trong leaps thường là chỉ số cột nếu x,y là dạng ma trận
 # Nhưng với công thức, một số phiên bản cho phép ta truyền tên trực tiếp (nếu không được, hãy dùng chỉ số).
 fit_sub2 <- regsubsets(y ~ t1 + t2 + t3 + t4,
@@ -40,8 +45,5 @@ fit_sub2 <- regsubsets(y ~ t1 + t2 + t3 + t4,
                        force.out = "t2")
 
 summary_sub2 <- summary(fit_sub2)
-summary_sub2$which
-summary_sub2$adjr2
-summary_sub2$cp
-summary_sub2$bic
+
 

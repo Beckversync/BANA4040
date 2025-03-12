@@ -288,6 +288,35 @@ Not really! Based on earlier single-predictor analyses:
 ## Part 4
  Fitting the model and model diagnostic For the best model according to R2a,p, fit the corresponding regression model and assess whether model assumptions are met. Do we
 have a good fit for the model?
+```{r, fig.width=7, fig.height=6}
+options(repr.plot.width = 7, repr.plot.height = 6)
+par(mfrow = c(2, 2))
+# Assuming the data frame is 'jobs' with columns proficiency, t1, t2, t3, t4:
+best_model <- lm(proficiency ~ t1 + t3 + t4, data = jobs)
+summary(best_model)
+# plot(best_model, which = 1)  # Residuals vs Fitted
+plot(best_model, which = 2)  # Normal Q-Q plot
+plot(best_model, which = 3)  # Scale-Location plot (spread vs. fitted)
+plot(best_model, which = 4)  # Cook's distance
+plot(best_model, which = 5)  # Residuals vs Leverage
+```
+
+## Conclusion
+From the four diagnostic plots, yes, the model looks to be fitting reasonably well overall. Here are some more detailed observations:
+
+Q–Q Plot
+The residuals lie fairly close to the diagonal, indicating that the normality assumption is not severely violated. There is a bit of deviation in the upper tail (observations such as #16, #19, #25), but it’s not drastic for a real‐world data set.
+
+Scale–Location (Spread vs. Fitted) Plot
+Although the red loess line isn’t perfectly flat, the variation in residuals doesn’t show a strong funnel shape or any major nonconstant variance. A slight rise or fall in the red line can happen; as long as it’s not extremely pronounced, homoscedasticity is not a big concern.
+
+Cook’s Distance
+Observations #11, #16, and #18 stand out somewhat, but their Cook’s distance (roughly 0.2 at most) is still well below the usual “rule‐of‐thumb” cutoff of 1. This suggests no single point is exerting a dramatically outsized influence on the regression fit.
+
+Residuals vs. Leverage
+Points #16 and #18 have relatively higher leverage (meaning these points lie a bit farther out in predictor space), but the standardized residuals are not huge. The dashed lines for Cook’s distance confirm they’re not excessively influential overall.
+
+Putting this all together, there are no severe violations of normality, constant variance, or linearity, and no single outlier is dominating the regression. Hence, we can conclude that the model assumptions are reasonably satisfied and we do have a good fit.
 
 ## Part 5
 Which model is the best with a given number of predictors? Suppose we only want to consider models with two predictors (or less). (Perhaps due to budget cuts the agency cannot administer as many aptitude tests). Suppose we want to finnd the "best" model
@@ -330,6 +359,50 @@ par(mfrow = c(1,1))
 identify(BICvals, labels = modelNames)
 identify(Cpvals, labels = modelNames)
 ```
+# Model Selection with Two or Fewer Predictors
+
+## 1. Identify the Candidate Models
+
+For models with **two predictors or fewer**, the possible models include:
+
+- **No predictors (Intercept-only):** `p = 1`
+- **One predictor:** `t1`, `t2`, `t3`, or `t4` (`p = 2`)
+- **Two predictors:** `t1 + t2`, `t1 + t3`, `t1 + t4`, `t2 + t3`, `t2 + t4`, `t3 + t4` (`p = 3`)
+
+The table below provides **BIC** and **Mallows' Cp** for each model.
+
+---
+
+## 2. Best Model by BIC
+
+Considering only models with **p ≤ 3**, the smallest **BIC** is for:
+
+- **Model:** `t1 + t3`
+- **BIC:** ≈ 163.55
+
+This is **substantially lower** than any other model with one or two predictors (e.g., `t3` alone has **BIC ≈ 187.07**).
+
+**Conclusion:** Using the **BIC** criterion, the best choice is the model **`t1 + t3`**.
+
+---
+
+## 3. Best Model by Mallows' Cp
+
+Similarly, examining **Mallows' Cp** values for models with **p ≤ 3**, the smallest value is again for:
+
+- **Model:** `t1 + t3`
+- **Cp:** ≈ 17.11
+
+This is **noticeably smaller** than the next-best single- or two-predictor model.
+
+**Conclusion:** By **Mallows' Cp**, the best model (with up to two predictors) is also **`t1 + t3`**.
+
+---
+
+## 4. Final Conclusion
+
+Whether judged by **BIC** or **Mallows' Cp**, if we are constrained to using **two or fewer predictors**, the **`t1 + t3`** model is the **clear winner**.
+
 ## Part 6
 Valdation: One of the validation techniques is to compare the SSEp and P RESSp of
 the models under considerations. Ideally, these two values should be close for the same
@@ -468,10 +541,12 @@ ggplot(jobs_data, aes(x = pred_forward, y = residuals(forward_model))) +
 ```
 
 # So sánh AIC của các mô hình
+```{r}
 aic_values <- data.frame(
   Model = c("Forward Selection", "Backward Elimination", "Stepwise Regression"),
   AIC = c(AIC(forward_model), AIC(backward_model), AIC(stepwise_model))
 )
+```
 ```{r, fig.width=7, fig.height=6}
 ggplot(aic_values, aes(x = Model, y = AIC, fill = Model)) +
   geom_bar(stat = "identity", width = 0.5) +
@@ -537,6 +612,8 @@ best_bic_index <- which.min(summary_sub$bic)
 
 # Kiểm tra biến nào được chọn ở mô hình best_adjr2_index
 summary_sub$which[best_adjr2_index, ]
+summary_sub$which[best_cp_index, ]
+summary_sub$which[best_bic_index, ]
 # Lưu ý: force.in / force.out trong leaps thường là chỉ số cột nếu x,y là dạng ma trận
 # Nhưng với công thức, một số phiên bản cho phép ta truyền tên trực tiếp (nếu không được, hãy dùng chỉ số).
 fit_sub2 <- regsubsets(y ~ t1 + t2 + t3 + t4,
@@ -548,10 +625,6 @@ fit_sub2 <- regsubsets(y ~ t1 + t2 + t3 + t4,
                        force.out = "t2")
 
 summary_sub2 <- summary(fit_sub2)
-summary_sub2$which
-summary_sub2$adjr2
-summary_sub2$cp
-summary_sub2$bic
 
 ```
 
