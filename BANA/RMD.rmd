@@ -628,7 +628,7 @@ summary_sub2 <- summary(fit_sub2)
 
 ```
 
-## Problem 2
+# Problem 3
 ## Part 1
 ```{r}
 library(readxl)
@@ -640,6 +640,7 @@ result <- lm(labor ~ shipped + cost + holiday, data = data)
 
 # Thiết lập cửa sổ đồ họa chia thành 1 hàng, 3 cột để vẽ 3 biểu đồ cạnh nhau
 par(mfrow = c(1, 3))
+```
 ```{r, fig.width=7, fig.height=6}
 options(repr.plot.width = 7, repr.plot.height = 6)
 # Biểu đồ Residuals vs Fitted Values
@@ -672,6 +673,23 @@ abline(h = 0, col = "red")
 par(mfrow = c(1,1))
 
 ```
+## Conclusion
+### Centered Around Zero
+
+Most points scatter around the horizontal line $y = 0$. This indicates there is no obvious systematic trend in the residuals (no strong curvature or other pattern), suggesting that the linearity assumption may be reasonably satisfied.
+
+### Few Extreme Outliers
+
+When looking at the standardized or studentized residuals, nearly all points lie within the $[-2, +2]$ range. We do not see any points exceeding the $\pm3$ or $\pm4$ thresholds, which often signal severe outliers. Hence, there is little evidence of major outliers that deviate strongly from the rest of the data.
+
+### No Pronounced Funnel Shape (Homoscedasticity)
+
+The spread of residuals does not systematically increase or decrease along the fitted values axis—there is no obvious “funnel” pattern. This suggests that the assumption of constant variance (homoscedasticity) is not badly violated.
+
+### Similarity Between Standardized and Studentized Residuals
+
+The studentized residuals do not inflate dramatically compared to the standardized residuals. This often happens if there is a point with high leverage. Hence, these plots do not indicate any high‐leverage points that would disproportionately influence the model.
+
 ## Part 2
 ```{r}
 library(readxl)
@@ -690,14 +708,14 @@ student.res <- rstudent(fit)
 # --- (a) Sắp xếp các phần dư studentized và in ra
 sorted_res <- sort(student.res)
 print("Sorted studentized residuals:")
-print(sorted_res)
+View(sorted_res)
 
 # Tính giá trị tới hạn theo phương pháp Bonferroni
 # Sử dụng α = 0.05. Giá trị tới hạn: qt(1 - α/(2*n), df = n - p - 1)
 alpha <- 0.05
 crit <- qt(1 - alpha/(2*n), df = n - p - 1)
 print("Critical value (Bonferroni):")
-print(crit)
+View(crit)
 ```{r, fig.width=7, fig.height=6}
 options(repr.plot.width = 7, repr.plot.height = 6)
 # --- (b) Vẽ biểu đồ phần dư studentized và overlay các đường giới hạn tới hạn
@@ -712,5 +730,21 @@ abline(h = -crit, col = "red", lty = 2)
 # --- (c) Liệt kê các quan sát có |studentized residual| > giá trị tới hạn
 outliers <- which(abs(student.res) > crit)
 print("Indices of potential outliers (|t_i| > critical value):")
-print(outliers)
+View(outliers)
 ```
+
+## Conclusion
+
+Based on the sorted studentized residuals and the Bonferroni critical value (
+≈3.518), no observations exceed ±3.518. In other words:
+
+### No Outliers in the Response
+Because all studentized residuals lie within the Bonferroni cutoffs, we have no evidence of extreme outliers on the response variable. The largest residual in magnitude is around 2.18, which is well within the acceptable range.
+
+### Model Fit
+The fact that none of the points are flagged suggests that the linear model does not have any single observation that is excessively far from its predicted value, at least in terms of studentized (leave‐one‐out) residuals.
+
+### Further Checks
+Even though no response outliers are detected, it can still be good practice to look at other influence metrics (like Cook’s distance or Residuals vs. Leverage plots) to be sure there are no high‐leverage points exerting an outsized influence on the fitted model.
+
+### In summary, no studentized residuals exceed the Bonferroni threshold, so there appear to be no outlying observations in the sense of response values.

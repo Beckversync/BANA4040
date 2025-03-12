@@ -1257,7 +1257,7 @@ BICp. Find the best models in terms of these criteria.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Problem 2}\label{problem-2}
+\section{Problem 3}\label{problem-3}
 
 \subsection{Part 1}\label{part-1-1}
 
@@ -1324,6 +1324,39 @@ BICp. Find the best models in terms of these criteria.
 \end{Highlighting}
 \end{Shaded}
 
+\subsection{Conclusion}\label{conclusion-2}
+
+\subsubsection{Centered Around Zero}\label{centered-around-zero}
+
+Most points scatter around the horizontal line \(y = 0\). This indicates
+there is no obvious systematic trend in the residuals (no strong
+curvature or other pattern), suggesting that the linearity assumption
+may be reasonably satisfied.
+
+\subsubsection{Few Extreme Outliers}\label{few-extreme-outliers}
+
+When looking at the standardized or studentized residuals, nearly all
+points lie within the \([-2, +2]\) range. We do not see any points
+exceeding the \(\pm3\) or \(\pm4\) thresholds, which often signal severe
+outliers. Hence, there is little evidence of major outliers that deviate
+strongly from the rest of the data.
+
+\subsubsection{No Pronounced Funnel Shape
+(Homoscedasticity)}\label{no-pronounced-funnel-shape-homoscedasticity}
+
+The spread of residuals does not systematically increase or decrease
+along the fitted values axis---there is no obvious ``funnel'' pattern.
+This suggests that the assumption of constant variance
+(homoscedasticity) is not badly violated.
+
+\subsubsection{Similarity Between Standardized and Studentized
+Residuals}\label{similarity-between-standardized-and-studentized-residuals}
+
+The studentized residuals do not inflate dramatically compared to the
+standardized residuals. This often happens if there is a point with high
+leverage. Hence, these plots do not indicate any high‐leverage points
+that would disproportionately influence the model.
+
 \subsection{Part 2}\label{part-2-1}
 
 \begin{Shaded}
@@ -1345,25 +1378,7 @@ BICp. Find the best models in terms of these criteria.
 \NormalTok{sorted\_res }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(student.res)}
 \FunctionTok{print}\NormalTok{(}\StringTok{"Sorted studentized residuals:"}\NormalTok{)}
 \CommentTok{\#\textgreater{} [1] "Sorted studentized residuals:"}
-\FunctionTok{print}\NormalTok{(sorted\_res)}
-\CommentTok{\#\textgreater{}          32          35          14          51          20           8 }
-\CommentTok{\#\textgreater{} {-}1.99766654 {-}1.66686277 {-}1.57563574 {-}1.37470514 {-}1.30688333 {-}1.20529304 }
-\CommentTok{\#\textgreater{}           7          47          31          37           9          16 }
-\CommentTok{\#\textgreater{} {-}1.11220903 {-}1.04682238 {-}0.98793522 {-}0.98726030 {-}0.97317140 {-}0.94585538 }
-\CommentTok{\#\textgreater{}          23          39          46          18          36          28 }
-\CommentTok{\#\textgreater{} {-}0.86199416 {-}0.77401415 {-}0.56690329 {-}0.53946536 {-}0.48548061 {-}0.41694583 }
-\CommentTok{\#\textgreater{}          13           4          21          12          48           1 }
-\CommentTok{\#\textgreater{} {-}0.41516269 {-}0.38465346 {-}0.37866873 {-}0.23775605 {-}0.23443689 {-}0.22408724 }
-\CommentTok{\#\textgreater{}           3          26          30          49          22          15 }
-\CommentTok{\#\textgreater{} {-}0.17058921 {-}0.16427705 {-}0.16381817  0.01909697  0.09348669  0.16177701 }
-\CommentTok{\#\textgreater{}           6          41          45          25          29          44 }
-\CommentTok{\#\textgreater{}  0.19612403  0.20535372  0.27680521  0.34737819  0.43222641  0.43246959 }
-\CommentTok{\#\textgreater{}          52          27          24           5          42          19 }
-\CommentTok{\#\textgreater{}  0.45278959  0.55395260  0.58204380  0.59079243  0.59660183  0.76695374 }
-\CommentTok{\#\textgreater{}          43          11           2          17          33          50 }
-\CommentTok{\#\textgreater{}  0.88556630  0.93459516  1.22549009  1.27571169  1.58403006  1.63020460 }
-\CommentTok{\#\textgreater{}          34          10          38          40 }
-\CommentTok{\#\textgreater{}  1.70041654  2.03651764  2.11878596  2.17827186}
+\FunctionTok{View}\NormalTok{(sorted\_res)}
 
 \CommentTok{\# Tính giá trị tới hạn theo phương pháp Bonferroni}
 \CommentTok{\# Sử dụng α = 0.05. Giá trị tới hạn: qt(1 {-} α/(2*n), df = n {-} p {-} 1)}
@@ -1371,8 +1386,7 @@ BICp. Find the best models in terms of these criteria.
 \NormalTok{crit }\OtherTok{\textless{}{-}} \FunctionTok{qt}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\NormalTok{(}\DecValTok{2}\SpecialCharTok{*}\NormalTok{n), }\AttributeTok{df =}\NormalTok{ n }\SpecialCharTok{{-}}\NormalTok{ p }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)}
 \FunctionTok{print}\NormalTok{(}\StringTok{"Critical value (Bonferroni):"}\NormalTok{)}
 \CommentTok{\#\textgreater{} [1] "Critical value (Bonferroni):"}
-\FunctionTok{print}\NormalTok{(crit)}
-\CommentTok{\#\textgreater{} [1] 3.518198}
+\FunctionTok{View}\NormalTok{(crit)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1397,10 +1411,40 @@ BICp. Find the best models in terms of these criteria.
 \NormalTok{outliers }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{abs}\NormalTok{(student.res) }\SpecialCharTok{\textgreater{}}\NormalTok{ crit)}
 \FunctionTok{print}\NormalTok{(}\StringTok{"Indices of potential outliers (|t\_i| \textgreater{} critical value):"}\NormalTok{)}
 \CommentTok{\#\textgreater{} [1] "Indices of potential outliers (|t\_i| \textgreater{} critical value):"}
-\FunctionTok{print}\NormalTok{(outliers)}
-\CommentTok{\#\textgreater{} named integer(0)}
+\FunctionTok{View}\NormalTok{(outliers)}
 \end{Highlighting}
 \end{Shaded}
 
+\subsection{Conclusion}\label{conclusion-3}
+
+Based on the sorted studentized residuals and the Bonferroni critical
+value ( ≈3.518), no observations exceed ±3.518. In other words:
+
+\subsubsection{No Outliers in the
+Response}\label{no-outliers-in-the-response}
+
+Because all studentized residuals lie within the Bonferroni cutoffs, we
+have no evidence of extreme outliers on the response variable. The
+largest residual in magnitude is around 2.18, which is well within the
+acceptable range.
+
+\subsubsection{Model Fit}\label{model-fit}
+
+The fact that none of the points are flagged suggests that the linear
+model does not have any single observation that is excessively far from
+its predicted value, at least in terms of studentized (leave‐one‐out)
+residuals.
+
+\subsubsection{Further Checks}\label{further-checks}
+
+Even though no response outliers are detected, it can still be good
+practice to look at other influence metrics (like Cook's distance or
+Residuals vs.~Leverage plots) to be sure there are no high‐leverage
+points exerting an outsized influence on the fitted model.
+
+\subsubsection{In summary, no studentized residuals exceed the
+Bonferroni threshold, so there appear to be no outlying observations in
+the sense of response
+values.}\label{in-summary-no-studentized-residuals-exceed-the-bonferroni-threshold-so-there-appear-to-be-no-outlying-observations-in-the-sense-of-response-values.}
 
 \end{document}

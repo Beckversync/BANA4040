@@ -22,8 +22,6 @@ alpha <- 0.05
 crit <- qt(1 - alpha/(2*n), df = n - p - 1)
 print("Critical value (Bonferroni):")
 print(crit)
-```{r, fig.width=25, fig.height=12}
-options(repr.plot.width = 25, repr.plot.height = 12)
 # --- (b) Vẽ biểu đồ phần dư studentized và overlay các đường giới hạn tới hạn
 plot(student.res, 
      ylab = "Studentized Residuals", 
@@ -31,7 +29,7 @@ plot(student.res,
      ylim = c(-4, 4))
 abline(h = crit, col = "red", lty = 2)
 abline(h = -crit, col = "red", lty = 2)
-```
+
 # --- (c) Liệt kê các quan sát có |studentized residual| > giá trị tới hạn
 outliers <- which(abs(student.res) > crit)
 print("Indices of potential outliers (|t_i| > critical value):")
