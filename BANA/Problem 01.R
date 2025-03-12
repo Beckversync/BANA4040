@@ -1,10 +1,10 @@
 # # Problem 01
 
 # # Read the data
-# library(readxl)
-# job_data <- read_excel("data.xlsx", col_names = FALSE)
-# colnames(job_data) = c("y", "t1", "t2", "t3", "t4")
-# job_data
+library(readxl)
+job_data <- read_excel("data.xlsx", col_names = FALSE)
+colnames(job_data) = c("y", "t1", "t2", "t3", "t4")
+job_data
 
 
 # #01 Graphical Summaries - Scatterplots
@@ -188,9 +188,9 @@
 
 #-------------------------------------------------------------------
 
-# #06 Validation
+#06 Validation
 
-# # How to find Model 11??? ??????????????????????????????????????????????????
+# How to find Model 11??? ??????????????????????????????????????????????????
 
 # # Fit Model 11 (assuming t1 + t3 is used based on previous results)
 # model_11 <- lm(y ~ t1 + t3, data = job_data)
@@ -214,100 +214,100 @@
 # # Print comparison
 # print(paste("SSE_p:", round(sse_p, 2), " | PRESS_p:", round(press_p, 2)))
 
-# # Ideally, SSE and PRESS should be close.
-# # BUY PRESS is higher than SSE, so the model overfits (performs well on training data but poorly on new data).
-# # Not a huge difference, so mild overfitting, but not extreme.
+# Ideally, SSE and PRESS should be close.
+# BUY PRESS is higher than SSE, so the model overfits (performs well on training data but poorly on new data).
+# Not a huge difference, so mild overfitting, but not extreme.
 
 
-# #-------------------------------------------------------------------
+#-------------------------------------------------------------------
 
-# #07 Automated search procedure
+#07 Automated search procedure
 
-# # Forward Selection
-# forward_model <- step(lm(y ~ 1, data = job_data),  
-#                       scope = ~ t1 + t2 + t3 + t4,  
-#                       direction = "forward")
+# Forward Selection
+forward_model <- step(lm(y ~ 1, data = job_data),  
+                      scope = ~ t1 + t2 + t3 + t4,  
+                      direction = "forward")
 
-#   # View selected model
-#   summary(forward_model)
+  # View selected model
+  summary(forward_model)
 
 
-# # Backward Elimination
-# backward_model <- step(lm(y ~ t1 + t2 + t3 + t4, data = job_data),  
-#                        direction = "backward")
+# Backward Elimination
+backward_model <- step(lm(y ~ t1 + t2 + t3 + t4, data = job_data),  
+                       direction = "backward")
 
-#   # View selected model
-#   summary(backward_model)
+  # View selected model
+  summary(backward_model)
 
   
-# # Stepwise Selection
-# stepwise_model <- step(lm(y ~ 1, data = job_data),  
-#                          scope = ~ t1 + t2 + t3 + t4,  
-#                          direction = "both")
+# Stepwise Selection
+stepwise_model <- step(lm(y ~ 1, data = job_data),  
+                         scope = ~ t1 + t2 + t3 + t4,  
+                         direction = "both")
   
-#   # View selected model
-#   summary(stepwise_model)
+  # View selected model
+  summary(stepwise_model)
   
 
-# # Print formulas of selected models
-# print(paste("Forward Selection Model:", formula(forward_model)))
-# print(paste("Backward Elimination Model:", formula(backward_model)))
-# print(paste("Stepwise Selection Model:", formula(stepwise_model)))
+# Print formulas of selected models
+print(paste("Forward Selection Model:", formula(forward_model)))
+print(paste("Backward Elimination Model:", formula(backward_model)))
+print(paste("Stepwise Selection Model:", formula(stepwise_model)))
 
-# # What Model(s) Were Chosen?
-#   # all three procedures chose the same model:
+# What Model(s) Were Chosen?
+  # all three procedures chose the same model:
 
-#     # t3 (most significant predictor)
-#     # t1 (moderate significance)
-#     # t4 (still relevant)
-#     # 2 was removed in all cases, meaning it does not add much predictive power.
+    # t3 (most significant predictor)
+    # t1 (moderate significance)
+    # t4 (still relevant)
+    # 2 was removed in all cases, meaning it does not add much predictive power.
 
-# # Impact of Starting Model:
-#   # Forward Selection: Starts from nothing → adds t3 → t1 → t4.
-#   # Backward Elimination: Starts with all variables → removes t2 first.
-#   # Stepwise Selection: Confirms t3 + t1 + t4 as the best model.
+# Impact of Starting Model:
+  # Forward Selection: Starts from nothing → adds t3 → t1 → t4.
+  # Backward Elimination: Starts with all variables → removes t2 first.
+  # Stepwise Selection: Confirms t3 + t1 + t4 as the best model.
 
-# # In general, different model selection methods may lead to different models because:
+# In general, different model selection methods may lead to different models because:
   
-#   # Forward selection is greedy – it adds variables step by step and might miss a better combination.
-#   # Backward elimination starts with all variables – it can be sensitive to collinearity and the order of removals.
-#   # Stepwise regression balances both but can still be influenced by starting conditions.
+  # Forward selection is greedy – it adds variables step by step and might miss a better combination.
+  # Backward elimination starts with all variables – it can be sensitive to collinearity and the order of removals.
+  # Stepwise regression balances both but can still be influenced by starting conditions.
 
 
-# #-------------------------------------------------------------------
+#-------------------------------------------------------------------
 
-# #08 Searching all models based on specified conditions
+# # #08 Searching all models based on specified conditions
 
-# Load necessary package
-library(leaps)
+# # Load necessary package
+# library(leaps)
 
-# Perform subset selection with a max of 3 predictors
-subset_models <- regsubsets(y ~ t1 + t2 + t3 + t4, data = job_data, nvmax = 3, method = "exhaustive")
-  # nvmax = 3 => Limits models to at most 3 predictors.
-  # method = "exhaustive" => Ensures all possible models are checked.
+# # Perform subset selection with a max of 3 predictors
+# subset_models <- regsubsets(y ~ t1 + t2 + t3 + t4, data = job_data, nvmax = 3, method = "exhaustive")
+#   # nvmax = 3 => Limits models to at most 3 predictors.
+#   # method = "exhaustive" => Ensures all possible models are checked.
 
-# Get summary
-subset_summary <- summary(subset_models)
+# # Get summary
+# subset_summary <- summary(subset_models)
 
-# Extract Adjusted R2, BIC, and Mallows' Cp
-adj_r2_values <- subset_summary$adjr2
-bic_values <- subset_summary$bic
-cp_values <- subset_summary$cp
+# # Extract Adjusted R2, BIC, and Mallows' Cp
+# adj_r2_values <- subset_summary$adjr2
+# bic_values <- subset_summary$bic
+# cp_values <- subset_summary$cp
 
-# Find the best models based on each criterion
-best_adj_r2_model <- which.max(adj_r2_values)
-best_bic_model <- which.min(bic_values)
-best_cp_model <- which.min(abs(cp_values - 3))  # Closest to p (number of predictors)
+# # Find the best models based on each criterion
+# best_adj_r2_model <- which.max(adj_r2_values)
+# best_bic_model <- which.min(bic_values)
+# best_cp_model <- which.min(abs(cp_values - 3))  # Closest to p (number of predictors)
 
-# Print results
-print(paste("Best model by Adjusted R2: Model", best_adj_r2_model))
-print(paste("Best model by BIC: Model", best_bic_model))
-print(paste("Best model by Mallows' Cp: Model", best_cp_model))
+# # Print results
+# print(paste("Best model by Adjusted R2: Model", best_adj_r2_model))
+# print(paste("Best model by BIC: Model", best_bic_model))
+# print(paste("Best model by Mallows' Cp: Model", best_cp_model))
 
-# Show which variables are included in the best models
-subset_summary$which[best_adj_r2_model, ]  # Best Adjusted R2 Model
-subset_summary$which[best_bic_model, ]  # Best BIC Model
-subset_summary$which[best_cp_model, ]  # Best Mallows' Cp Model
+# # Show which variables are included in the best models
+# subset_summary$which[best_adj_r2_model, ]  # Best Adjusted R2 Model
+# subset_summary$which[best_bic_model, ]  # Best BIC Model
+# subset_summary$which[best_cp_model, ]  # Best Mallows' Cp Model
 
 
   
