@@ -26,7 +26,7 @@
 - Check that your models meet statistical assumptions and provide diagnostics when needed.
 - Maintain clear and concise code structure and comments for readability.
 
-## ## Assignment Tasks 2 Outlier Detection in Grocery Data using R
+##  Assignment Tasks 2 Outlier Detection in Grocery Data using R
 
 This project aims to detect influential outliers in grocery data using R. The dataset contains weekly activity data from a national grocery retailer, and the analysis focuses on identifying anomalies in the response and predictor variables.
 
