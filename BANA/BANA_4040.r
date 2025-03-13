@@ -1,7 +1,7 @@
 # Problem 1 , part 1:
 
-library(readxl)
-jobs <- read_excel("data.xlsx", col_names = FALSE)
+# library(readxl)
+jobs <- read.table("job.txt", header = FALSE)
 colnames(jobs) <- c("proficiency", "t1", "t2", "t3", "t4")
 summary(jobs)
 par(mfrow = c(2, 2))
@@ -309,8 +309,7 @@ summary_sub2$bic
 # Problem 2 , part 1:
 library(readxl)
 # Đọc dữ liệu từ file "grocery.txt"
-data <- read_excel("grocery.xlsx", col_names = TRUE)
-
+data <- read.table("grocery.txt", header = FALSE)
 # Xây dựng mô hình hồi quy tuyến tính với các biến dự báo: shipped, cost, và holiday
 result <- lm(labor ~ shipped + cost + holiday, data = data)
 

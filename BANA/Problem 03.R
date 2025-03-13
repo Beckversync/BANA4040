@@ -39,7 +39,7 @@ print(sorted_residuals)
 
 # Bonferroni Outlier Test
 n <- nrow(grocery_data)  # Number of observations
-p <- length(coef(result))-1  # Number of predictors + intercept
+p <- length(coef(result))  # Number of predictors + intercept
 alpha <- 0.05
 bonferroni_cutoff <- qt(1 - alpha / (2 * n), df = n - p - 1)
 print(paste("Bonferroni cutoff:", bonferroni_cutoff))
