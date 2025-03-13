@@ -119,5 +119,5 @@ for (k in 0:4) {
 }
 
 # Xem kết quả
-results
+View(results)
 
